@@ -1,0 +1,83 @@
+---
+title: "Configuration"
+date: "{{ now | date "2006-01-02T15:04:05" }}+01:00"
+weight: 20
+geekdocRepo: https://github.com/owncloud/ocis-konnectd
+geekdocEditPath: edit/master/docs
+geekdocFilePath: configuration.md
+---
+
+{{`{{< toc >}}`}}
+
+## Configuration
+
+oCIS Single Binary is not responsible for configuring extensions. Instead, each extension could either be configured by environment variables, cli flags or config files.
+
+### Configuration using config files
+
+Out of the box extensions will attempt to read configuration details from:
+
+```console
+/etc/ocis
+$HOME/.ocis
+./config
+```
+
+For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `proxy.json | yaml | toml ...`*.
+
+### Envrionment variables
+
+If you prefer to configure the service with environment variables you can see the available variables below.
+
+#### Server
+{{ range $opts := . }}{{ with $opts }}
+{{- if eq .FnName "ServerWithConfig"}}
+{{ index .Env 0 }}
+: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
+{{ end }}
+{{- end }}
+{{- end }}
+#### Root Command
+{{ range $opts := . }}{{ with $opts }}
+{{- if eq .FnName "RootWithConfig"}}
+{{ index .Env 0 }}
+: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
+{{ end }}
+{{- end }}
+{{- end }}
+#### Health
+{{ range $opts := . }}{{ with $opts }}
+{{- if eq .FnName "HealthWithConfig"}}
+{{ index .Env 0 }}
+: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
+{{ end }}
+{{- end }}
+{{- end }}
+### Commandline flags
+
+If you prefer to configure the service with commandline flags you can see the available variables below.
+
+#### Server
+{{ range $opts := . }}{{ with $opts }}
+{{- if eq .FnName "ServerWithConfig"}}
+--{{ .Name}}
+: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
+{{ end }}
+{{- end }}
+{{- end }}
+#### Root Command
+{{ range $opts := . }}{{ with $opts }}
+{{- if eq .FnName "RootWithConfig"}}
+--{{ .Name}}
+: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
+{{ end }}
+{{- end }}
+{{- end }}
+#### Health
+{{ range $opts := . }}{{ with $opts }}
+{{- if eq .FnName "HealthWithConfig"}}
+--{{ .Name}}
+: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
+{{ end -}}
+{{- end -}}
+{{- end -}}

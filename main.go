@@ -2,17 +2,18 @@ package main
 
 import (
 	"flag"
-	"github.com/Masterminds/sprig"
 	"io/ioutil"
 	"log"
 	"os"
 	"text/template"
+
+	"github.com/Masterminds/sprig"
 )
 
 func main() {
 
-	var flagsetPath = flag.String("path", "", "Path to flagset file or directory")
-	var templatePath = flag.String("template", "flaex.tpl", "Path to go-template template file")
+	var flagsetPath = flag.String("path", "pkg/flagset/", "Path to flagset file or directory")
+	var templatePath = flag.String("template", "CONFIGURATION.tmpl", "Path to go-template template file")
 	flag.Parse()
 	fi, err := os.Stat(*flagsetPath)
 	if err != nil {
