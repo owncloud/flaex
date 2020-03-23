@@ -9,11 +9,11 @@ import (
 )
 
 type ParsedOption struct {
-	name       string
-	env        []string
-	usage      string
-	defaultVal string
-	fnName     string
+	Name    string
+	Env     []string
+	Usage   string
+	Default string
+	FnName  string
 }
 
 type ParsedOptions []ParsedOption
@@ -50,23 +50,23 @@ func (v *flagSetVisitor) Visit(node ast.Node) (w ast.Visitor) {
 					val := exprToStr(kvExpr.Value)
 					switch key {
 					case "Name":
-						o.name = val
+						o.Name = val
 					case "Usage":
-						o.usage = val
+						o.Usage = val
 					case "Value":
-						o.defaultVal = val
+						o.Default = val
 					case "EnvVars":
 						if comp, ok := kvExpr.Value.(*ast.CompositeLit); ok {
 							for _, envVar := range comp.Elts {
 								ev := exprToStr(envVar)
-								o.env = append(o.env, ev)
+								o.Env = append(o.Env, ev)
 							}
 						}
 					}
 				}
 			}
 
-			o.fnName = v.currentFn
+			o.FnName = v.currentFn
 			v.parsedOptions = append(v.parsedOptions, o)
 		}
 	}
