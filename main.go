@@ -25,10 +25,9 @@ func main() {
 			log.Fatalf("unable to read template from %v: %v", *templatePath, err)
 		}
 
-		tpl, err := template.New("").Funcs(sprig.GenericFuncMap()).Parse(string(tplContent))
-		if err != nil {
-			log.Fatal(err)
-		}
+		tpl := template.Must(
+			template.New("").Funcs(sprig.GenericFuncMap()).Parse(string(tplContent)),
+		)
 
 		opts, err := ParseFile(*flagsetPath)
 		if err != nil {
