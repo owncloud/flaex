@@ -36,6 +36,21 @@ func ParseFile(path string) (ParsedOptions, error) {
 	return fv.parsedOptions, nil
 }
 
+func ParseDir(path string) (ParsedOptions, error) {
+	fs := token.NewFileSet()
+	pkgs, err := parser.ParseDir(fs, path, nil, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	fv := &flagSetVisitor{}
+	for _, pkg := range pkgs {
+		ast.Walk(fv, pkg)
+	}
+
+	return fv.parsedOptions, nil
+}
+
 func (v *flagSetVisitor) Visit(node ast.Node) (w ast.Visitor) {
 	if fn, ok := node.(*ast.FuncDecl); ok {
 		v.currentFn = fn.Name.Name
