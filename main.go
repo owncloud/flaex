@@ -20,23 +20,30 @@ func main() {
 		log.Fatal(err)
 	}
 
+	tplContent, err := ioutil.ReadFile(*templatePath)
+	if err != nil {
+		log.Fatalf("unable to read template from %v: %v", *templatePath, err)
+	}
+
+	tpl := template.Must(
+		template.New("").Funcs(sprig.GenericFuncMap()).Parse(string(tplContent)),
+	)
+
+	var opts ParsedOptions
+
 	if !fi.IsDir() {
-		tplContent, err := ioutil.ReadFile(*templatePath)
-		if err != nil {
-			log.Fatalf("unable to read template from %v: %v", *templatePath, err)
-		}
-
-		tpl := template.Must(
-			template.New("").Funcs(sprig.GenericFuncMap()).Parse(string(tplContent)),
-		)
-
-		opts, err := ParseFile(*flagsetPath)
+		opts, err = ParseFile(*flagsetPath)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		if err := tpl.Execute(os.Stdout, opts); err != nil {
+	} else {
+		opts, err = ParseDir(*flagsetPath)
+		if err != nil {
 			log.Fatal(err)
 		}
+	}
+
+	if err := tpl.Execute(os.Stdout, opts); err != nil {
+		log.Fatal(err)
 	}
 }
