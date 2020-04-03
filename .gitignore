@@ -1,1 +1,5 @@
-flaex
+coverage.out
+
+/bin
+/dist
+/hugo
