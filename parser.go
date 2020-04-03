@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// ParsedOption represents a single Configuration option
 type ParsedOption struct {
 	Name    string
 	Env     []string
@@ -16,6 +17,7 @@ type ParsedOption struct {
 	FnName  string
 }
 
+// ParsedOptions represents a set of Configuration options
 type ParsedOptions []ParsedOption
 
 type flagSetVisitor struct {
@@ -23,6 +25,7 @@ type flagSetVisitor struct {
 	parsedOptions []ParsedOption
 }
 
+// ParseFile parses a single go file for Configuration options
 func ParseFile(path string) (ParsedOptions, error) {
 	fs := token.NewFileSet()
 	f, err := parser.ParseFile(fs, path, nil, 0)
@@ -36,6 +39,7 @@ func ParseFile(path string) (ParsedOptions, error) {
 	return fv.parsedOptions, nil
 }
 
+// ParseDir parses a folder for go files with Configuration options
 func ParseDir(path string) (ParsedOptions, error) {
 	fs := token.NewFileSet()
 	pkgs, err := parser.ParseDir(fs, path, nil, 0)
