@@ -13,7 +13,7 @@ import (
 func main() {
 
 	var flagsetPath = flag.String("path", "pkg/flagset/", "Path to flagset file or directory")
-	var templatePath = flag.String("template", "CONFIGURATION.tmpl", "Path to go-template template file")
+	var templatePath = flag.String("template", "templates/CONFIGURATION.tmpl", "Path to go-template template file")
 	flag.Parse()
 	fi, err := os.Stat(*flagsetPath)
 	if err != nil {
