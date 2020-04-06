@@ -1,4 +1,4 @@
-package main
+package parsers
 
 import (
 	"go/ast"
@@ -25,8 +25,8 @@ type flagSetVisitor struct {
 	parsedOptions []ParsedOption
 }
 
-// ParseFile parses a single go file for Configuration options
-func ParseFile(path string) (ParsedOptions, error) {
+// ParseFlagsetFile parses a single go file for Configuration options
+func ParseFlagsetFile(path string) (ParsedOptions, error) {
 	fs := token.NewFileSet()
 	f, err := parser.ParseFile(fs, path, nil, 0)
 	if err != nil {
@@ -39,8 +39,8 @@ func ParseFile(path string) (ParsedOptions, error) {
 	return fv.parsedOptions, nil
 }
 
-// ParseDir parses a folder for go files with Configuration options
-func ParseDir(path string) (ParsedOptions, error) {
+// ParseFlagsetDir parses a folder for go files with Configuration options
+func ParseFlagsetDir(path string) (ParsedOptions, error) {
 	fs := token.NewFileSet()
 	pkgs, err := parser.ParseDir(fs, path, nil, 0)
 	if err != nil {

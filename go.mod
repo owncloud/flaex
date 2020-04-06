@@ -13,4 +13,5 @@ require (
 	golang.org/x/crypto v0.0.0-20200320181102-891825fb96df // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
+	honnef.co/go/tools v0.0.1-2020.1.3 // indirect
 )

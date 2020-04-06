@@ -8,14 +8,27 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/owncloud/flaex/pkg/parsers"
 )
+
+// TemplateVariables holds all variables for the rendering
+type TemplateVariables struct {
+	Commands parsers.ParsedCommands
+	Options  parsers.ParsedOptions
+}
 
 func main() {
 
-	var flagsetPath = flag.String("path", "pkg/flagset/", "Path to flagset file or directory")
+	var commandPath = flag.String("command-path", "pkg/command/", "Path to command file or directory")
+	var flagsetPath = flag.String("flagset-path", "pkg/flagset/", "Path to flagset file or directory")
 	var templatePath = flag.String("template", "templates/CONFIGURATION.tmpl", "Path to go-template template file")
 	flag.Parse()
-	fi, err := os.Stat(*flagsetPath)
+	finfocp, err := os.Stat(*commandPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	finfofs, err := os.Stat(*flagsetPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,21 +42,33 @@ func main() {
 		template.New("").Funcs(sprig.GenericFuncMap()).Parse(string(tplContent)),
 	)
 
-	var opts ParsedOptions
+	templateVariables := TemplateVariables{}
 
-	if !fi.IsDir() {
-		opts, err = ParseFile(*flagsetPath)
+	if !finfocp.IsDir() {
+		templateVariables.Commands, err = parsers.ParseCommandFile(*commandPath)
 		if err != nil {
 			log.Fatal(err)
 		}
 	} else {
-		opts, err = ParseDir(*flagsetPath)
+		templateVariables.Commands, err = parsers.ParseCommandDir(*commandPath)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if err := tpl.Execute(os.Stdout, opts); err != nil {
+	if !finfofs.IsDir() {
+		templateVariables.Options, err = parsers.ParseFlagsetFile(*flagsetPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		templateVariables.Options, err = parsers.ParseFlagsetDir(*flagsetPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if err := tpl.Execute(os.Stdout, templateVariables); err != nil {
 		log.Fatal(err)
 	}
 }
