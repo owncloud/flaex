@@ -9,10 +9,11 @@ import (
 
 // ParsedCommand represents a single Configuration option
 type ParsedCommand struct {
-	Name  string
-	Usage string
-	Flags string
-	Type  string
+	Name   string
+	Usage  string
+	Flags  string
+	Type   string
+	FnName string
 }
 
 // ParsedCommands represents a set of Configuration options
@@ -76,7 +77,7 @@ func (v *commandVisitor) Visit(node ast.Node) (w ast.Visitor) {
 					}
 				}
 			}
-
+			c.FnName = v.currentFn
 			v.parsedCommands = append(v.parsedCommands, c)
 		}
 	}
