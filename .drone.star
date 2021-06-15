@@ -176,7 +176,7 @@ def changelog(ctx):
       },
       {
         'name': 'diff',
-        'image': 'owncloud/alpine:latest',
+        'image': 'owncloudci/alpine:latest',
         'pull': 'always',
         'commands': [
           'git diff',
@@ -184,7 +184,7 @@ def changelog(ctx):
       },
       {
         'name': 'output',
-        'image': 'owncloud/alpine:latest',
+        'image': 'owncloudci/alpine:latest',
         'pull': 'always',
         'commands': [
           'cat CHANGELOG.md',
