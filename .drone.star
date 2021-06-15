@@ -176,7 +176,7 @@ def changelog(ctx):
       },
       {
         'name': 'diff',
-        'image': 'owncloud/alpine:latest',
+        'image': 'owncloudci/alpine:latest',
         'pull': 'always',
         'commands': [
           'git diff',
@@ -184,7 +184,7 @@ def changelog(ctx):
       },
       {
         'name': 'output',
-        'image': 'owncloud/alpine:latest',
+        'image': 'owncloudci/alpine:latest',
         'pull': 'always',
         'commands': [
           'cat CHANGELOG.md',
@@ -250,7 +250,7 @@ def website(ctx):
       },
       {
         'name': 'test',
-        'image': 'webhippie/hugo:latest',
+        'image': 'owncloudci/hugo:0.71.0',
         'commands': [
           'cd hugo',
           'hugo',
@@ -289,7 +289,7 @@ def website(ctx):
         'name': 'downstream',
         'image': 'plugins/downstream',
         'settings': {
-          'server': 'https://cloud.drone.io/',
+          'server': 'https://drone.owncloud.com/',
           'token': {
             'from_secret': 'drone_token',
           },
