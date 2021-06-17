@@ -4,14 +4,13 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"strings"
 )
 
 // ParsedCommand represents a single Configuration option
 type ParsedCommand struct {
 	Name   string
 	Usage  string
-	Flags  string
+	Flags  []string
 	Type   string
 	FnName string
 }
@@ -73,7 +72,7 @@ func (v *commandVisitor) Visit(node ast.Node) (w ast.Visitor) {
 					case "Usage":
 						c.Usage = val
 					case "Flags":
-						c.Flags = cleanFlagset(val)
+						c.Flags = getFlagset(kvExpr.Value)
 					}
 				}
 			}
@@ -94,10 +93,23 @@ func isCommandType(sel *ast.SelectorExpr) bool {
 	return false
 }
 
-func cleanFlagset(fl string) string {
-	r := strings.NewReplacer(
-		"flagset.", "",
-		"(cfg)", "",
-	)
-	return r.Replace(fl)
+func getFlagset(flagset ast.Expr) (flagsets []string) {
+
+	if fc, ok := flagset.(*ast.CallExpr); ok {
+		if fi, ok := fc.Fun.(*ast.Ident); ok {
+			if fi.Name == "append" {
+				for _, arg := range fc.Args {
+					fs := getFlagset(arg)
+					flagsets = append(flagsets, fs...)
+				}
+			}
+		} else if se, ok := fc.Fun.(*ast.SelectorExpr); ok {
+			if fi, ok := se.X.(*ast.Ident); ok {
+				if fi.Name == "flagset" {
+					flagsets = append(flagsets, se.Sel.Name)
+				}
+			}
+		}
+	}
+	return flagsets
 }
