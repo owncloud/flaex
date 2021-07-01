@@ -116,6 +116,8 @@ func getValue(kvExpr ast.Expr) (value string) {
 					if len(fun.Args) == 2 {
 						if val, ok := fun.Args[1].(*ast.BasicLit); ok {
 							return val.Value
+						} else if val, ok := fun.Args[1].(*ast.Ident); ok {
+							return val.Name
 						}
 					}
 				}
@@ -125,3 +127,5 @@ func getValue(kvExpr ast.Expr) (value string) {
 	}
 	return value
 }
+
+// TODO: GLAUTH_BACKEND_USE_GRAPHAPI
