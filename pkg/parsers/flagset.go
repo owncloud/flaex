@@ -73,7 +73,7 @@ func (v *flagSetVisitor) Visit(node ast.Node) (w ast.Visitor) {
 					case "Usage":
 						o.Usage = val
 					case "Value":
-						o.Default = val
+						o.Default = getValue(kvExpr)
 					case "EnvVars":
 						if comp, ok := kvExpr.Value.(*ast.CompositeLit); ok {
 							for _, envVar := range comp.Elts {
@@ -105,4 +105,23 @@ func isFlagType(sel *ast.SelectorExpr) bool {
 func exprToStr(x ast.Expr) string {
 	exprStr := types.ExprString(x)
 	return strings.Trim(exprStr, "\"")
+}
+
+func getValue(kvExpr ast.Expr) (value string) {
+	if kv, ok := kvExpr.(*ast.KeyValueExpr); ok {
+		v := kv.Value
+		if fun, ok := v.(*ast.CallExpr); ok {
+			if ce, ok := fun.Fun.(*ast.SelectorExpr); ok {
+				if strings.HasPrefix(ce.Sel.Name, "OverrideDefault") {
+					if len(fun.Args) == 2 {
+						if val, ok := fun.Args[1].(*ast.BasicLit); ok {
+							return val.Value
+						}
+					}
+				}
+			}
+		}
+		return exprToStr(kv.Value)
+	}
+	return value
 }
