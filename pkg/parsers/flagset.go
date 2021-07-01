@@ -1,8 +1,11 @@
 package parsers
 
 import (
+	"bytes"
+	"fmt"
 	"go/ast"
 	"go/parser"
+	"go/printer"
 	"go/token"
 	"go/types"
 	"strings"
@@ -73,7 +76,7 @@ func (v *flagSetVisitor) Visit(node ast.Node) (w ast.Visitor) {
 					case "Usage":
 						o.Usage = val
 					case "Value":
-						o.Default = val
+						o.Default = getValue(kvExpr)
 					case "EnvVars":
 						if comp, ok := kvExpr.Value.(*ast.CompositeLit); ok {
 							for _, envVar := range comp.Elts {
@@ -88,21 +91,45 @@ func (v *flagSetVisitor) Visit(node ast.Node) (w ast.Visitor) {
 			o.FnName = v.currentFn
 			v.parsedOptions = append(v.parsedOptions, o)
 		}
+		fmt.Print("")
 	}
 
 	return v
 }
 
 func isFlagType(sel *ast.SelectorExpr) bool {
-	switch sel.Sel.Name {
-	case "StringFlag", "BoolFlag", "SliceFlag":
-		return true
-	}
-
-	return false
+	return strings.HasSuffix(sel.Sel.Name, "Flag")
 }
 
 func exprToStr(x ast.Expr) string {
 	exprStr := types.ExprString(x)
 	return strings.Trim(exprStr, "\"")
+}
+
+func getValue(kvExpr ast.Expr) (value string) {
+	if kv, ok := kvExpr.(*ast.KeyValueExpr); ok {
+		v := kv.Value
+		if fun, ok := v.(*ast.CallExpr); ok {
+			if ce, ok := fun.Fun.(*ast.SelectorExpr); ok {
+				if strings.HasPrefix(ce.Sel.Name, "OverrideDefault") {
+					if len(fun.Args) == 2 {
+						if val, ok := fun.Args[1].(*ast.BasicLit); ok {
+							return val.Value
+						} else if val, ok := fun.Args[1].(*ast.Ident); ok {
+							return val.Name
+						} else if _, ok := fun.Args[1].(*ast.BinaryExpr); ok {
+							buf := new(bytes.Buffer)
+							fset := token.NewFileSet()
+							err := printer.Fprint(buf, fset, fun.Args[1])
+							if err == nil {
+								return buf.String()
+							}
+						}
+					}
+				}
+			}
+		}
+		return exprToStr(kv.Value)
+	}
+	return value
 }
